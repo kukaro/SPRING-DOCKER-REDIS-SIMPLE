@@ -1,0 +1,1 @@
+docker exec -it springboot-app /bin/bash

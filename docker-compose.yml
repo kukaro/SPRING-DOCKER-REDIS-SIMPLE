@@ -1,0 +1,40 @@
+version: '3'
+services:
+  mysql: # 네트워크 연결시 사용할 이름(service name)
+    image: mysql:8
+    container_name: mysql # docker 명령어 처리시 접근할 이름
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  app:
+    image: openjdk:17-jdk-alpine
+    container_name: springboot-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/testdb
+      SPRING_DATASOURCE_USERNAME: testuser
+      SPRING_DATASOURCE_PASSWORD: testpass
+      SPRING_REDIS_HOST: redis
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql
+      - redis
+
+volumes:
+  mysql_data:
